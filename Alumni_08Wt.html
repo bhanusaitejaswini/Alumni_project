@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Alumni Tracking System — Department of Computer Applications</title>
+  <style>
+    :root{
+      --accent: #0f766e; /* teal */
+      --accent-2: #0ea5e9; /* sky */
+      --bg: #f6fbfb;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --radius: 12px;
+      --glass: rgba(255,255,255,0.6);
+      --shadow: 0 6px 18px rgba(15,23,42,0.08);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background: linear-gradient(180deg, #f2fbfa 0%, #ffffff 60%);
+      color: #0f172a;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:28px;
+    }
+
+    .container{
+      max-width:1100px;
+      margin:0 auto;
+    }
+
+    header{
+      text-align:center;
+      margin-bottom:22px;
+    }
+    .project-title{
+      font-size:26px;
+      font-weight:700;
+      color:var(--accent);
+      letter-spacing:0.2px;
+    }
+    .project-sub{
+      margin-top:6px;
+      color:var(--muted);
+      font-weight:600;
+    }
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:18px;
+    }
+
+    form.row{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:12px;
+    }
+    @media (max-width:780px){ form.row{grid-template-columns:1fr} }
+
+    label{
+      display:block;
+      font-size:13px;
+      margin-bottom:6px;
+      color:#0f172a;
+      font-weight:600;
+    }
+    input[type="text"], input[type="email"], input[type="tel"], select, textarea {
+      width:100%;
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid #e6eef0;
+      background:#fcffff;
+      font-size:14px;
+      outline:none;
+    }
+    textarea{ min-height:90px; resize:vertical; }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-top:8px;
+    }
+    button{
+      background:var(--accent);
+      color:white;
+      border:none;
+      padding:10px 14px;
+      border-radius:9px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    button.secondary{
+      background:#e6eef0;
+      color:var(--accent);
+    }
+    .small{
+      padding:8px 10px;
+      font-size:13px;
+      border-radius:8px;
+    }
+
+    .table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:12px;
+    }
+    .table th, .table td{
+      padding:10px 8px;
+      border-bottom:1px solid #eef6f6;
+      text-align:left;
+      font-size:14px;
+    }
+    .table th{ color:var(--muted); font-weight:700; font-size:13px; }
+    .actions button{ margin-right:6px; }
+
+    .badge{
+      display:inline-block;
+      padding:6px 8px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      color:white;
+    }
+    .badge.job{ background:#10b981; }
+    .badge.higher{ background:#6366f1; }
+    .badge.unemp{ background:#ef4444; }
+
+    .footer{
+      margin-top:28px;
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .inline-flex{ display:flex; gap:8px; align-items:center; }
+    .file-input{ display:inline-block; }
+    .searchbar{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-bottom:10px;
+    }
+    .muted{ color:var(--muted); font-size:13px; }
+
+    /* small responsiveness tweaks */
+    @media (max-width:520px){
+      .controls{ flex-direction:column; align-items:stretch; }
+      button{ width:100%; }
+    }
+
+    /* feedback area */
+    .feedback-list{ margin-top:12px; }
+    .feedback-item{
+      background: linear-gradient(90deg, #ffffff, #f8ffff);
+      border-radius:10px;
+      padding:10px;
+      margin-bottom:8px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      box-shadow: 0 3px 10px rgba(2,6,23,0.04);
+    }
+    .feedback-body{ font-size:14px; color:#0f172a; }
+    .group-members{
+      margin-top:18px;
+      padding:12px;
+      border-radius:10px;
+      background:linear-gradient(180deg,#ffffff,#fbfeff);
+      box-shadow: var(--shadow);
+    }
+    .hint{ font-size:12px; color:var(--muted); margin-top:6px; }
+    .tiny{ font-size:12px; color:var(--muted) }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="project-title">Alumni Tracking System</div>
+      <div class="project-sub">Department of Computer Applications</div>
+      <div class="project-sub" style="font-weight:600;margin-top:4px">Vignan University</div>
+    </header>
+
+    <section class="card" id="registration-card">
+      <h3 style="margin:0 0 10px 0">Alumni Registration</h3>
+
+      <form id="alumniForm" class="row">
+        <input type="hidden" id="recordId" value="">
+        <div>
+          <label for="name">Full name</label>
+          <input id="name" type="text" placeholder="John Doe" required>
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="john@example.com">
+        </div>
+
+        <div>
+          <label for="phone">Phone</label>
+          <input id="phone" type="tel" placeholder="+91 98765 43210">
+        </div>
+        <div>
+          <label for="batch">Batch / Year</label>
+          <input id="batch" type="text" placeholder="2020">
+        </div>
+
+        <div>
+          <label for="degree">Degree</label>
+           <select id="status">
+            <option value="MCA">MCA</option>
+            <option value="BCA">BCA</option>
+            <option value="OTHER">OTHER</option>
+          </select>
+        </div>
+        <div>
+          <label for="status">Current Status</label>
+          <select id="status">
+            <option value="Job">Job</option>
+            <option value="Higher Studies">Higher Studies</option>
+            <option value="Unemployed">Unemployed</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="organization">Organization / University</label>
+          <input id="organization" type="text" placeholder="Company or University name">
+        </div>
+        <div>
+          <label for="coursepos">Course / Position</label>
+          <input id="coursepos" type="text" placeholder="MSc Computer Science or Software Engineer">
+        </div>
+
+        <div style="grid-column:1 / -1">
+          <label for="profile">Profile / Notes (LinkedIn, Github, etc.)</label>
+          <textarea id="profile" placeholder="LinkedIn: ... | Github: ..."></textarea>
+        </div>
+
+        <div style="grid-column:1 / -1">
+          <label for="feedbackFld">Initial feedback (optional)</label>
+          <textarea id="feedbackFld" placeholder="Feedback or message from alumni (optional)"></textarea>
+        </div>
+
+        <div style="grid-column:1 / -1" class="controls">
+          <button id="saveBtn" type="submit">Save / Add Alumni</button>
+          <button id="clearBtn" type="button" class="secondary small">Clear Form</button>
+
+          <div style="margin-left:auto" class="inline-flex">
+            <label class="tiny muted" for="csvInput">Import CSV</label>
+            <input id="csvInput" type="file" accept=".csv" class="file-input small">
+            <button id="exportCsv" type="button" class="small secondary">Export CSV</button>
+          </div>
+        </div>
+      </form>
+      <div class="hint">CSV import supports header rows. Expected headers (case-insensitive): name,email,phone,batch,degree,status,organization,coursepos,profile,feedback</div>
+    </section>
+
+    <section class="card">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+        <h3 style="margin:0">Alumni Directory</h3>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input id="search" type="text" placeholder="Search by name, org, degree..." style="padding:8px;border-radius:8px;border:1px solid #e6eef0">
+          <select id="filterStatus" style="padding:8px;border-radius:8px;border:1px solid #e6eef0">
+            <option value="">All statuses</option>
+            <option value="Job">Job</option>
+            <option value="Higher Studies">Higher Studies</option>
+            <option value="Unemployed">Unemployed</option>
+          </select>
+        </div>
+      </div>
+
+      <table class="table" id="alumniTable">
+        <thead>
+          <tr>
+            <th>Name</th><th>Email / Phone</th><th>Batch / Degree</th><th>Status</th><th>Org / Course-Position</th><th>Profile</th><th>Feedback</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="alumniTbody"></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h3 style="margin-top:0">Feedback (bottom)</h3>
+      <div>
+        <label for="fbName">Your name</label>
+        <input id="fbName" type="text" placeholder="Your name...">
+
+        <label for="fbText" style="margin-top:8px">Feedback</label>
+        <textarea id="fbText" placeholder="Write a quick feedback..."></textarea>
+
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button id="addFeedbackBtn">Add Feedback</button>
+          <button id="clearFeedbackForm" class="secondary">Clear</button>
+        </div>
+
+        <div class="feedback-list" id="feedbackList"></div>
+      </div>
+    </section>
+
+    <section class="group-members card">
+      <h4 style="margin:0 0 8px 0">Group Members</h4>
+      <div style="display:flex;flex-wrap:wrap;gap:12px">
+        <div><strong>Rohit Kumar</strong><div class="tiny muted">251FD01047</div></div>
+        <div><strong>Bhanu Sai Tejaswini</strong><div class="tiny muted">251FD01060</div></div>
+        <div><strong>Shauna</strong><div class="tiny muted">251FD01069</div></div>
+      </div>
+      <div class="hint">Project by group members listed above.</div>
+    </section>
+
+    <div class="footer">
+      <div class="muted">Local storage used to save alumni & feedback data. Clearing browser storage will remove data.</div>
+    </div>
+  </div>
+
+  <script>
+    /* ---------- storage helpers ---------- */
+    const LS_ALUMNI = 'alumniData_v1';
+    const LS_FEEDBACK = 'feedbackData_v1';
+
+    function saveAlumni(arr){
+      localStorage.setItem(LS_ALUMNI, JSON.stringify(arr || []));
+    }
+    function loadAlumni(){
+      try{
+        const a = JSON.parse(localStorage.getItem(LS_ALUMNI) || '[]');
+        return Array.isArray(a) ? a : [];
+      }catch(e){ return []; }
+    }
+
+    function saveFeedback(arr){
+      localStorage.setItem(LS_FEEDBACK, JSON.stringify(arr || []));
+    }
+    function loadFeedback(){
+      try{
+        const a = JSON.parse(localStorage.getItem(LS_FEEDBACK) || '[]');
+        return Array.isArray(a) ? a : [];
+      }catch(e){ return []; }
+    }
+
+    /* ---------- utilities ---------- */
+    function uid(){
+      return 'id_' + Math.random().toString(36).slice(2,9);
+    }
+
+    function formatBadge(status){
+      if(!status) return '';
+      if(status.toLowerCase().includes('job')) return '<span class="badge job">Job</span>';
+      if(status.toLowerCase().includes('higher')) return '<span class="badge higher">Higher Studies</span>';
+      return '<span class="badge unemp">Unemployed</span>';
+    }
+
+    /* ---------- render alumni table ---------- */
+    const alumniTbody = document.getElementById('alumniTbody');
+    const searchInput = document.getElementById('search');
+    const filterStatus = document.getElementById('filterStatus');
+
+    function renderAlumni(){
+      const rows = loadAlumni();
+      const q = searchInput.value.trim().toLowerCase();
+      const statusFilter = filterStatus.value;
+      const filtered = rows.filter(r => {
+        if(statusFilter && r.status !== statusFilter) return false;
+        if(!q) return true;
+        const hay = (r.name + ' ' + (r.organization||'') + ' ' + (r.degree||'') + ' ' + (r.coursepos||'')).toLowerCase();
+        return hay.includes(q);
+      });
+
+      alumniTbody.innerHTML = filtered.map(r => `
+        <tr data-id="${r.id}">
+          <td><strong>${escapeHtml(r.name || '')}</strong><div class="tiny muted">${escapeHtml(r.email || '')}</div></td>
+          <td>${escapeHtml(r.email || '')}<div class="tiny muted">${escapeHtml(r.phone || '')}</div></td>
+          <td>${escapeHtml(r.batch || '')} <div class="tiny muted">${escapeHtml(r.degree || '')}</div></td>
+          <td>${formatBadge(r.status)}</td>
+          <td><strong>${escapeHtml(r.organization || '')}</strong><div class="tiny muted">${escapeHtml(r.coursepos || '')}</div></td>
+          <td class="tiny muted">${escapeHtml(r.profile || '')}</td>
+          <td class="tiny muted">${escapeHtml(r.feedback || '')}</td>
+          <td class="actions">
+            <button class="small" onclick="editRecord('${r.id}')">Edit</button>
+            <button class="small" onclick="deleteRecord('${r.id}')">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function escapeHtml(s){ if(!s) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+    /* ---------- form logic ---------- */
+    const alumniForm = document.getElementById('alumniForm');
+    const recordIdFld = document.getElementById('recordId');
+    const nameFld = document.getElementById('name');
+    const emailFld = document.getElementById('email');
+    const phoneFld = document.getElementById('phone');
+    const batchFld = document.getElementById('batch');
+    const degreeFld = document.getElementById('degree');
+    const statusFld = document.getElementById('status');
+    const orgFld = document.getElementById('organization');
+    const courseposFld = document.getElementById('coursepos');
+    const profileFld = document.getElementById('profile');
+    const feedbackFld = document.getElementById('feedbackFld');
+
+    document.getElementById('clearBtn').addEventListener('click', e => {
+      alumniForm.reset();
+      recordIdFld.value = '';
+      document.getElementById('saveBtn').textContent = 'Save / Add Alumni';
+    });
+
+    alumniForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      const id = recordIdFld.value || uid();
+      const newRec = {
+        id,
+        name: nameFld.value.trim(),
+        email: emailFld.value.trim(),
+        phone: phoneFld.value.trim(),
+        batch: batchFld.value.trim(),
+        degree: degreeFld.value.trim(),
+        status: statusFld.value,
+        organization: orgFld.value.trim(),
+        coursepos: courseposFld.value.trim(),
+        profile: profileFld.value.trim(),
+        feedback: feedbackFld.value.trim()
+      };
+      if(!newRec.name){
+        alert('Name is required.');
+        return;
+      }
+      const data = loadAlumni();
+      const idx = data.findIndex(r => r.id === id);
+      if(idx >= 0){
+        data[idx] = newRec;
+      }else{
+        data.unshift(newRec);
+      }
+      saveAlumni(data);
+      alumniForm.reset();
+      recordIdFld.value = '';
+      document.getElementById('saveBtn').textContent = 'Save / Add Alumni';
+      renderAlumni();
+    });
+
+    /* edit / delete */
+    window.editRecord = function(id){
+      const data = loadAlumni();
+      const rec = data.find(r => r.id === id);
+      if(!rec) return alert('Record not found');
+      recordIdFld.value = rec.id;
+      nameFld.value = rec.name || '';
+      emailFld.value = rec.email || '';
+      phoneFld.value = rec.phone || '';
+      batchFld.value = rec.batch || '';
+      degreeFld.value = rec.degree || '';
+      statusFld.value = rec.status || 'Job';
+      orgFld.value = rec.organization || '';
+      courseposFld.value = rec.coursepos || '';
+      profileFld.value = rec.profile || '';
+      feedbackFld.value = rec.feedback || '';
+      document.getElementById('saveBtn').textContent = 'Update Record';
+      window.scrollTo({top:0, behavior:'smooth'});
+    };
+
+    window.deleteRecord = function(id){
+      if(!confirm('Delete this alumni record?')) return;
+      let data = loadAlumni().filter(r => r.id !== id);
+      saveAlumni(data);
+      renderAlumni();
+    };
+
+    /* ---------- search / filters ---------- */
+    searchInput.addEventListener('input', renderAlumni);
+    filterStatus.addEventListener('change', renderAlumni);
+
+    /* ---------- CSV export ---------- */
+    document.getElementById('exportCsv').addEventListener('click', function(){
+      const data = loadAlumni();
+      if(!data || data.length === 0){
+        alert('No data to export.');
+        return;
+      }
+      const header = [
+        "id","name","email","phone","batch","degree","status",
+        "organization","coursepos","profile","feedback"
+      ];
+      const rows = data.map(r => header.map(h => stringifyCsvCell(r[h] ?? '')).join(','));
+      const csv = [header.join(',')].concat(rows).join('\\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'alumni_export.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    function stringifyCsvCell(s){
+      s = s == null ? '' : String(s);
+      if(s.includes('"')) s = s.replaceAll('"','""');
+      if(s.includes(',') || s.includes('"') || s.includes('\\n') || s.includes('\\r')) return `"${s}"`;
+      return s;
+    }
+
+    /* ---------- CSV import ---------- */
+    document.getElementById('csvInput').addEventListener('change', async function(e){
+      const f = e.target.files[0];
+      if(!f) return;
+      const txt = await f.text();
+      const parsed = parseCSV(txt);
+      // parsed: array of rows (array of strings). If header row, map by header names.
+      if(parsed.length === 0){ alert('No rows parsed in CSV'); return; }
+      let header = parsed[0].map(h => String(h || '').trim().toLowerCase());
+      let hasHeader = header.includes('name') || header.includes('email');
+      let rows = parsed.slice(hasHeader ? 1 : 0);
+      const existing = loadAlumni();
+      let addedCount = 0;
+      rows.forEach(cols => {
+        // Map by header if header exists
+        let rec = {};
+        if(hasHeader){
+          header.forEach((h,i) => { rec[h] = cols[i] || ''; });
+        } else {
+          // fallback mapping: try to map common columns by position
+          rec = {
+            name: cols[0]||'',
+            email: cols[1]||'',
+            phone: cols[2]||'',
+            batch: cols[3]||'',
+            degree: cols[4]||'',
+            status: cols[5]||'',
+            organization: cols[6]||'',
+            coursepos: cols[7]||'',
+            profile: cols[8]||'',
+            feedback: cols[9]||''
+          };
+        }
+        // create final record object with expected keys
+        const final = {
+          id: uid(),
+          name: (rec.name || rec.fullname || rec['student name'] || '').trim(),
+          email: (rec.email || '').trim(),
+          phone: (rec.phone || '').trim(),
+          batch: (rec.batch || rec.year || '').trim(),
+          degree: (rec.degree || '').trim(),
+          status: (rec.status || '').trim() || 'Job',
+          organization: (rec.organization || rec.university || '').trim(),
+          coursepos: (rec.coursepos || rec.position || rec.course || '').trim(),
+          profile: (rec.profile || '').trim(),
+          feedback: (rec.feedback || '').trim()
+        };
+        if(final.name) {
+          existing.unshift(final);
+          addedCount++;
+        }
+      });
+      saveAlumni(existing);
+      renderAlumni();
+      alert('Imported ' + addedCount + ' records.');
+      e.target.value = '';
+    });
+
+    // simple CSV parser that respects quoted fields
+    function parseCSV(text){
+      const rows = [];
+      let cur = [];
+      let curcell = '';
+      let i=0, inQuotes=false;
+      while(i < text.length){
+        const ch = text[i];
+        if(inQuotes){
+          if(ch === '"'){
+            if(text[i+1] === '"'){ curcell += '"'; i += 2; continue; }
+            else { inQuotes = false; i++; continue; }
+          } else {
+            curcell += ch; i++; continue;
+          }
+        } else {
+          if(ch === '"'){ inQuotes = true; i++; continue; }
+          if(ch === ','){ cur.push(curcell); curcell=''; i++; continue; }
+          if(ch === '\\r'){ i++; continue; }
+          if(ch === '\\n'){ cur.push(curcell); rows.push(cur); cur = []; curcell=''; i++; continue; }
+          curcell += ch; i++;
+        }
+      }
+      // push last
+      if(curcell.length > 0 || inQuotes === false){
+        cur.push(curcell);
+      }
+      if(cur.length) rows.push(cur);
+      // remove possible empty last row if only whitespace
+      return rows.filter(r => r.length > 1 || (r.length === 1 && r[0].trim() !== ''));
+    }
+
+    /* ---------- Feedback logic ---------- */
+    const feedbackListEl = document.getElementById('feedbackList');
+    const fbName = document.getElementById('fbName');
+    const fbText = document.getElementById('fbText');
+
+    function renderFeedback(){
+      const arr = loadFeedback();
+      feedbackListEl.innerHTML = arr.map(f => `
+        <div class="feedback-item" data-id="${f.id}">
+          <div style="flex:1">
+            <div style="font-weight:700">${escapeHtml(f.name || 'Anonymous')}</div>
+            <div class="feedback-body">${escapeHtml(f.text || '')}</div>
+            <div class="tiny muted" style="margin-top:6px">Added: ${new Date(f.created || f.ts || Date.now()).toLocaleString()}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <button class="small" onclick="editFeedback('${f.id}')">Edit</button>
+            <button class="small" onclick="deleteFeedback('${f.id}')">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('addFeedbackBtn').addEventListener('click', function(){
+      const name = fbName.value.trim() || 'Anonymous';
+      const text = fbText.value.trim();
+      if(!text){ alert('Please enter feedback'); return; }
+      const fbArr = loadFeedback();
+      fbArr.unshift({ id: uid(), name, text, created: Date.now() });
+      saveFeedback(fbArr);
+      fbName.value = ''; fbText.value = '';
+      renderFeedback();
+    });
+
+    document.getElementById('clearFeedbackForm').addEventListener('click', function(){
+      fbName.value=''; fbText.value='';
+    });
+
+    window.deleteFeedback = function(id){
+      if(!confirm('Delete this feedback?')) return;
+      const arr = loadFeedback().filter(f => f.id !== id);
+      saveFeedback(arr);
+      renderFeedback();
+    };
+
+    window.editFeedback = function(id){
+      const arr = loadFeedback();
+      const f = arr.find(x => x.id === id);
+      if(!f) return;
+      const newName = prompt('Edit name', f.name || '');
+      if(newName === null) return;
+      const newText = prompt('Edit feedback text', f.text || '');
+      if(newText === null) return;
+      f.name = newName.trim() || 'Anonymous';
+      f.text = newText.trim();
+      saveFeedback(arr);
+      renderFeedback();
+    };
+
+    /* ---------- small helpers ---------- */
+    function initDemoIfEmpty(){
+      // optional: keep empty to respect user. We'll not add demo data.
+    }
+
+    /* ---------- boot ---------- */
+    renderAlumni();
+    renderFeedback();
+    initDemoIfEmpty();
+
+    // basic CSV quick test (developer helper) - commented out
+    // console.log(parseCSV('name,email\\n"John, Jr","a@b.com"\\nAlice,alice@x.com'));
+
+  </script>
+</body>
+</html>
